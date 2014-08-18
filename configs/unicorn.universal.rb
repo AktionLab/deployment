@@ -15,11 +15,11 @@ preload_app true
 
 GC.copy_on_write_friendly = true if GC.respond_to?(:copy_on_write_friendly=)
 
-before_exec do
+before_exec do |server|
   ENV['BUNDLE_GEMFILE'] = "#{app_path}/current/Gemfile"
 end
 
-before_fork do |server|
+before_fork do |server,worker|
   ActiveRecord::Base.connection.disconnect! if defined? ActiveRecord::Base
 
   old_pid = "#{server.config[:pid]}.oldbin"
@@ -32,6 +32,6 @@ before_fork do |server|
   end
 end
 
-after_fork do |server|
+after_fork do |server,worker|
   ActiveRecord::Base.establish_connection if defined? ActiveRecord::Base
 end
